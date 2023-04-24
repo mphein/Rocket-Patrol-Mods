@@ -8,9 +8,13 @@ class Menu extends Phaser.Scene {
         this.load.audio('sfx_select', './assets/blip_select12.wav');
         this.load.audio('sfx_explosion', './assets/explosion38.wav');
         this.load.audio('sfx_rocket', './assets/rocket_shot.wav');
+        // pixelbay Royalty free music (Cosmic glow by Andrewkn)
+        this.load.audio('menu_background', './assets/cosmic.mp3');  
     }
 
     create() {
+        this.sound.play('menu_background', {volume: .5, loop: true});
+
         let menuConfig = {
             fontFamily: 'Courier',
             fontSize: '28px',
@@ -54,7 +58,8 @@ class Menu extends Phaser.Scene {
             gameTimer: 45000    
           }
           this.sound.play('sfx_select');
-          this.scene.start('playScene');    
+          this.scene.start('playScene'); 
+          
         }
       }
 }

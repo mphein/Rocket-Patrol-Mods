@@ -79,9 +79,32 @@ class Play extends Phaser.Scene {
             this.add.text(game.config.width/2, game.config.height/2 + 64, 'Press (R) to Restart or ← for Menu', scoreConfig).setOrigin(0.5);
             this.gameOver = true;
         }, null, this);
+
+        this.displayFire = this.add.text(game.config.width/2, borderUISize + borderPadding * 2, 'FIRE', scoreConfig).setOrigin(.5, 0);
+        this.displayFire.alpha = 0;
     }
 
     update() {
+        let fireConfig = {
+            fontFamily: 'Courier',
+            fontSize: '28px',
+            backgroundColor: '#F3B141',
+            color: '#843605',
+            align: 'right',
+            padding: {
+                top: 5,
+                bottom: 5,
+            },
+            fixedWidth: 0
+        }
+
+        if (this.p1Rocket.isFiring) {
+            this.displayFire.alpha = 1;
+        } else {
+            this.displayFire.alpha = 0;
+        }
+        
+
         // check key input for restart
         if (this.gameOver && Phaser.Input.Keyboard.JustDown(keyR)) {
             this.scene.restart();

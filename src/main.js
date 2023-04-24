@@ -1,3 +1,7 @@
+// Michael Hein
+// Rocket Patrol
+// 2 hour
+
 let config = {
     type: Phaser.CANVAS,
     width: 640,
@@ -12,4 +16,6 @@ let borderPadding = borderUISize / 3;
 
 // reserve keyboard vars
 let keyF, keyR, keyLEFT, keyRIGHT;
+
+let highScore = 0;
 

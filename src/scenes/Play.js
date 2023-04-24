@@ -69,6 +69,10 @@ class Play extends Phaser.Scene {
         }
         this.scoreLeft = this.add.text(borderUISize + borderPadding, borderUISize + borderPadding * 2, this.p1Score, scoreConfig);
 
+        // display high score
+        this.highScoreRight = this.add.text(game.config.width - borderUISize * 4 - borderPadding, borderUISize + borderPadding * 2, highScore, scoreConfig);
+        
+        
         // GAME OVER flag
         this.gameOver = false;
 
@@ -81,23 +85,18 @@ class Play extends Phaser.Scene {
         }, null, this);
 
         this.displayFire = this.add.text(game.config.width/2, borderUISize + borderPadding * 2, 'FIRE', scoreConfig).setOrigin(.5, 0);
-        this.displayFire.alpha = 0;
+        this.displayFire.alpha = 0;        
+
+        this.spaceshipBoosters = this.time.delayedCall(game.settings.gameTimer / 2, ()=> {
+            console.log('BOOST');
+            this.ship01.moveSpeed = this.ship01.moveSpeed * 2;
+            this.ship02.moveSpeed = this.ship02.moveSpeed * 2;
+            this.ship03.moveSpeed = this.ship03.moveSpeed * 2;
+        });
     }
 
     update() {
-        let fireConfig = {
-            fontFamily: 'Courier',
-            fontSize: '28px',
-            backgroundColor: '#F3B141',
-            color: '#843605',
-            align: 'right',
-            padding: {
-                top: 5,
-                bottom: 5,
-            },
-            fixedWidth: 0
-        }
-
+        // display 'FIRE UI'
         if (this.p1Rocket.isFiring) {
             this.displayFire.alpha = 1;
         } else {
@@ -165,6 +164,11 @@ class Play extends Phaser.Scene {
         // score add and repaint
         this.p1Score += ship.points;
         this.scoreLeft.text = this.p1Score;
+
+        if (this.p1Score > highScore) {
+            this.highScoreRight.text = this.p1Score;
+            highScore = this.p1Score;
+        }
 
         this.sound.play('sfx_explosion')
     }

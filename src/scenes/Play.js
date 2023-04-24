@@ -7,6 +7,7 @@ class Play extends Phaser.Scene {
         this.load.image('rocket', './assets/rocket.png');
         this.load.image('spaceship', './assets/spaceship.png');
         this.load.image('starfield', './assets/starfield.png');
+        this.load.image('desert', './assets/desert.png');
 
         // load spritesheet
         this.load.spritesheet('explosion','./assets/explosion.png', {
@@ -19,7 +20,8 @@ class Play extends Phaser.Scene {
   
     create() {
         // place the tile sprite
-        this.starfield = this.add.tileSprite(0, 0, 640, 480, 'starfield').setOrigin(0, 0);
+        //this.starfield = this.add.tileSprite(0, 0, 640, 480, 'starfield').setOrigin(0, 0);
+        this.desert = this.add.tileSprite(0, -20, 640, 480, 'desert').setOrigin(0, 0);
         // green UI background
         this.add.rectangle(0, borderUISize + borderPadding, game.config.width, borderUISize * 2, 0x00FF00).setOrigin(0, 0);
         // white borders
@@ -84,15 +86,20 @@ class Play extends Phaser.Scene {
             this.gameOver = true;
         }, null, this);
 
+        // FIRE UI
         this.displayFire = this.add.text(game.config.width/2, borderUISize + borderPadding * 2, 'FIRE', scoreConfig).setOrigin(.5, 0);
         this.displayFire.alpha = 0;        
 
+        // speed up spaceships after gameTimer/2
         this.spaceshipBoosters = this.time.delayedCall(game.settings.gameTimer / 2, ()=> {
             console.log('BOOST');
             this.ship01.moveSpeed = this.ship01.moveSpeed * 2;
             this.ship02.moveSpeed = this.ship02.moveSpeed * 2;
             this.ship03.moveSpeed = this.ship03.moveSpeed * 2;
         });
+
+        // randomize SFX
+        this.explodeSFX = ['sfx_explosion1','sfx_explosion2','sfx_explosion3','sfx_explosion4']
     }
 
     update() {
@@ -113,7 +120,7 @@ class Play extends Phaser.Scene {
             this.scene.start("menuScene");
           }
 
-        this.starfield.tilePositionX -= 4;
+        this.desert.tilePositionX -= 1;
         if (!this.gameOver){
             this.p1Rocket.update();
             this.ship01.update();
@@ -170,6 +177,7 @@ class Play extends Phaser.Scene {
             highScore = this.p1Score;
         }
 
-        this.sound.play('sfx_explosion')
+        // choose a random explosion sound from explodeSFX array
+        this.sound.play(this.explodeSFX[Math.floor(Math.random() * 4)]);
     }
 }

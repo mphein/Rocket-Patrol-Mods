@@ -34,6 +34,5 @@ class Spaceship extends Phaser.GameObjects.Sprite {
         } else {
             this.x = 0;
         }
-        
     }
 }

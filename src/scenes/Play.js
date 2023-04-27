@@ -5,11 +5,13 @@ class Play extends Phaser.Scene {
 
     preload() {
         // load images/tile sprites
-        this.load.image('rocket', './assets/rocket.png');
+        this.load.image('rocket1', './assets/rocket1.png');
+        this.load.image('rocket2', './assets/rocket2.png');
         this.load.image('spaceship', './assets/spaceship.png');
         this.load.image('starfield', './assets/starfield.png');
         this.load.image('desert', './assets/desert.png');
         this.load.image('alienship', './assets/alienship.png');
+        this.load.image('particle', './assets/particle.png');
         // load spritesheet
         this.load.spritesheet('explosion','./assets/explosion.png', {
             frameWidth: 64,
@@ -37,8 +39,10 @@ class Play extends Phaser.Scene {
         this.add.rectangle(0, game.config.height - borderUISize, game.config.width, borderUISize, 0xFFFFFF).setOrigin(0, 0);
         this.add.rectangle(0, 0, borderUISize, game.config.height, 0xFFFFFF).setOrigin(0, 0);
         this.add.rectangle(game.config.width - borderUISize, 0, borderUISize, game.config.height, 0xFFFFFF).setOrigin(0, 0);
-        // add rocket (p1)
-        this.p1Rocket = new Rocket(this, game.config.width/2, game.config.height - borderUISize - borderPadding, 'rocket').setOrigin(.5, 0);
+        // add rocket (p1 + p2)
+        this.p1Rocket = new Rocket(this, game.config.width/2 + borderPadding, game.config.height - borderUISize - borderPadding, 'rocket1',true).setOrigin(.5, 0);
+        this.p2Rocket = new Rocket(this, game.config.width/2 - borderPadding, game.config.height - borderUISize - borderPadding, 'rocket2',false).setOrigin(.5, 0);
+        this.p1turn = true;
 
         // define keys
         keyF = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.F);
@@ -111,11 +115,17 @@ class Play extends Phaser.Scene {
 
         // randomize SFX
         this.explodeSFX = ['sfx_explosion1','sfx_explosion2','sfx_explosion3','sfx_explosion4']
+
+        // particle emitter
+        this.particles = this.add.particles(0,0,'particle', {
+        });
+
+        
     }
 
     update() {
         // display 'FIRE UI'
-        if (this.p1Rocket.isFiring) {
+        if (this.p1Rocket.isFiring || this.p2Rocket.isFiring) {
             this.displayFire.alpha = 1;
         } else {
             this.displayFire.alpha = 0;
@@ -132,30 +142,66 @@ class Play extends Phaser.Scene {
           }
 
         this.desert.tilePositionX -= 1;
-        if (!this.gameOver){
-            this.p1Rocket.update();
-            this.ship01.update();
-            this.ship02.update();
-            this.ship03.update();
-            this.ship04.update();
-        }   
-
-        // check collisions
-        if (this.checkCollision(this.p1Rocket, this.ship03)) {
-            this.p1Rocket.reset();
-            this.shipExplode(this.ship03);
-        }
-        if (this.checkCollision(this.p1Rocket, this.ship02)) {
-            this.p1Rocket.reset();
-            this.shipExplode(this.ship02);
-        }
-        if (this.checkCollision(this.p1Rocket, this.ship01)) {
-            this.p1Rocket.reset();
-            this.shipExplode(this.ship01);
-        }
-        if (this.checkCollision(this.p1Rocket, this.ship04)) {
-            this.p1Rocket.reset();
-            this.shipExplode(this.ship04);
+        console.log(this.p1Rocket.turn);
+        if (this.p1Rocket.turn) {
+            if (!this.gameOver){
+                this.p1Rocket.update();
+                this.ship01.update();
+                this.ship02.update();
+                this.ship03.update();
+                this.ship04.update();
+            }   
+            // check collisions
+            if (this.checkCollision(this.p1Rocket, this.ship03)) {
+                this.p1Rocket.reset();
+                this.shipExplode(this.ship03);
+            }
+            if (this.checkCollision(this.p1Rocket, this.ship02)) {
+                this.p1Rocket.reset();
+                this.shipExplode(this.ship02);
+            }
+            if (this.checkCollision(this.p1Rocket, this.ship01)) {
+                this.p1Rocket.reset();
+                this.shipExplode(this.ship01);
+            }
+            if (this.checkCollision(this.p1Rocket, this.ship04)) {
+                this.p1Rocket.reset();
+                this.shipExplode(this.ship04);
+            }
+            if (this.p1Rocket.turn != this.p1turn) {
+                this.p2Rocket.changeTurn();
+                this.p1turn = false;
+            }
+        } else {
+            console.log('p2turn!')
+            if (!this.gameOver){
+                this.p2Rocket.update();
+                this.ship01.update();
+                this.ship02.update();
+                this.ship03.update();
+                this.ship04.update();
+            }   
+            // check collisions
+            if (this.checkCollision(this.p2Rocket, this.ship03)) {
+                this.p2Rocket.reset();
+                this.shipExplode(this.ship03);
+            }
+            if (this.checkCollision(this.p2Rocket, this.ship02)) {
+                this.p2Rocket.reset();
+                this.shipExplode(this.ship02);
+            }
+            if (this.checkCollision(this.p2Rocket, this.ship01)) {
+                this.p2Rocket.reset();
+                this.shipExplode(this.ship01);
+            }
+            if (this.checkCollision(this.p2Rocket, this.ship04)) {
+                this.p2Rocket.reset();
+                this.shipExplode(this.ship04);
+            }
+            if (this.p2Rocket.turn == this.p1turn) {
+                this.p1turn = true;
+                this.p1Rocket.changeTurn();
+            }
         }
     }
 
@@ -176,14 +222,21 @@ class Play extends Phaser.Scene {
         // temporarily hide ship
         ship.alpha = 0;
         // create explosion sprite at ship's position
-        let boom = this.add.sprite(ship.x, ship.y, 'explosion').setOrigin(0,0);
-        boom.anims.play('explode');
-        boom.on('animationcomplete', () => {
+        //let boom = this.add.sprite(ship.x, ship.y, 'explosion').setOrigin(0,0);
+        //boom.anims.play('explode');
+        
+        this.particles.setPosition(ship.x, ship.y);
+        this.particles.start(0,500);
+        this.particles.setParticleSpeed(200);
+        this.particles.setBlendMode(Phaser.BlendModes.ADD);
+        this.particles.setParticleGravity(0,1000);
+        setTimeout(()=> {
+            this.particles.stop();
+            console.log('HERE')
             ship.reset();
             ship.alpha = 1;
-            boom.destroy();
-        });
-
+        }, 500);
+        
         // score add and repaint
         this.p1Score += ship.points;
         this.scoreLeft.text = this.p1Score;

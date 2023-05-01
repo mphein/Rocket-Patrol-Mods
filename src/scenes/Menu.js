@@ -50,6 +50,7 @@ class Menu extends Phaser.Scene {
         this.playerTwoInstruct2 = this.add.text(game.config.width/2, game.config.height/2 + borderUISize * 3 + borderPadding * 3,
         'Player 2 use (<)(>) to move & (L) to fire', menuConfig).setOrigin(0.5);
         menuConfig.backgroundColor = '#00FF00';
+        menuConfig.fixedWidth = 0;
         this.add.text(game.config.width/2, game.config.height/2 + borderUISize + borderPadding,
         'Press ← for Novice or → for Expert', menuConfig).setOrigin(0.5);
         // define keys
@@ -83,7 +84,7 @@ class Menu extends Phaser.Scene {
           game.settings = {
             alienshipSpeed: 5,
             spaceshipSpeed: 3,
-            gameTimer: 60000,
+            gameTimer: 6000,
             onePlayer: this.onePlayer
           }
           this.sound.play('sfx_select');
@@ -94,7 +95,7 @@ class Menu extends Phaser.Scene {
           game.settings = {
             alienshipSpeed: 6,
             spaceshipSpeed: 4,
-            gameTimer: 45000,
+            gameTimer: 6000,
             onePlayer: this.onePlayer
           }
           this.sound.play('sfx_select');

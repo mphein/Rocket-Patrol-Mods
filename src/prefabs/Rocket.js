@@ -1,6 +1,6 @@
 // Rocket prefab
 class Rocket extends Phaser.GameObjects.Sprite {
-    constructor(scene, x, y, texture, turn, frame) {
+    constructor(scene, x, y, texture, turn, numPlayers, frame) {
         super(scene, x, y, texture, frame);
 
         // add object to existing scene
@@ -10,19 +10,20 @@ class Rocket extends Phaser.GameObjects.Sprite {
         this.sfxRocket = scene.sound.add('sfx_rocket'); // add rocket sfx
         console.log(turn);
         this.turn = turn;
+        this.numPlayers = numPlayers;
     }
 
     update() {
         if (this.turn) {
             // left/right movement
-            if (keyLEFT.isDown && this.x >= borderUISize + this.width) {
+            if ((keyLEFT.isDown || keyP2LEFT.isDown) && this.x >= borderUISize + this.width) {
                 this.x -= this.moveSpeed;
-            } else if (keyRIGHT.isDown && this.x <= game.config.width - borderUISize - this.width) {
+            } else if ((keyRIGHT.isDown || keyP2RIGHT.isDown) && this.x <= game.config.width - borderUISize - this.width) {
                 this.x += this.moveSpeed;
             }
 
             // fire button
-            if (Phaser.Input.Keyboard.JustDown(keyF) && !this.isFiring) {
+            if ((Phaser.Input.Keyboard.JustDown(keyF)||Phaser.Input.Keyboard.JustDown(keyL)) && !this.isFiring) {
                 this.isFiring = true;
                 this.sfxRocket.play(); // play sfx
             }
@@ -34,7 +35,10 @@ class Rocket extends Phaser.GameObjects.Sprite {
             if (this.y <= borderUISize * 3 + borderPadding) {
                 this.isFiring = false;
                 this.y = game.config.height - borderUISize - borderPadding;
-                this.changeTurn();
+                if (this.numPlayers ==2) {
+                    console.log('TURN CHANGE');
+                    this.changeTurn();
+                }
             }
         }
     }
@@ -43,7 +47,9 @@ class Rocket extends Phaser.GameObjects.Sprite {
     reset() {
         this.isFiring = false;
         this.y = game.config.height - borderUISize - borderPadding;
-        this.changeTurn();
+        if (this.numPlayers == 2) {
+            this.changeTurn();
+        }
     }
 
     changeTurn() {

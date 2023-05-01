@@ -39,22 +39,52 @@ class Menu extends Phaser.Scene {
         '2 PLAYER CO-OP', menuConfig).setOrigin(0.5);
         this.add.text(game.config.width/2, game.config.height/2,
         'Use ←→ arrows to move & (F) to fire', menuConfig).setOrigin(0.5);
-        menuConfig.backgroundColor = '#00FF00';
+        
         menuConfig.color = '#000';
+        menuConfig.backgroundColor= '#FF0000';
+        this.playerText = this.add.text(game.config.width/2, game.config.height/2 + borderUISize * 2 + borderPadding * 2,
+        'Press ↓ to toggle local multiplayer', menuConfig).setOrigin(0.5);
+        this.playerTwoInstruct = this.add.text(game.config.width/2, game.config.height/2 + borderUISize * 4 + borderPadding * 4,
+        '(L) to fire', menuConfig).setOrigin(0.5);
+        menuConfig.fixedWidth = '500';
+        this.playerTwoInstruct2 = this.add.text(game.config.width/2, game.config.height/2 + borderUISize * 3 + borderPadding * 3,
+        'Player 2 use (<)(>) to move & (L) to fire', menuConfig).setOrigin(0.5);
+        menuConfig.backgroundColor = '#00FF00';
         this.add.text(game.config.width/2, game.config.height/2 + borderUISize + borderPadding,
         'Press ← for Novice or → for Expert', menuConfig).setOrigin(0.5);
         // define keys
         keyLEFT = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT);
         keyRIGHT = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT);
+        keyDOWN = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.DOWN);
+        this.onePlayer = true;
+        
     }
 
     update() {
+        if (Phaser.Input.Keyboard.JustDown(keyDOWN)) {
+          console.log('DOWN');
+          console.log(this.onePlayer);
+          this.onePlayer = !this.onePlayer;
+
+          if (this.onePlayer) {
+            console.log('RED');
+            this.playerText.setBackgroundColor('#FF0000');
+            this.playerTwoInstruct.setBackgroundColor('#FF0000')
+            this.playerTwoInstruct2.setBackgroundColor('#FF0000')
+          } else {
+            this.playerText.setBackgroundColor('#00FF00');
+            this.playerTwoInstruct.setBackgroundColor('#00FF00')
+            this.playerTwoInstruct2.setBackgroundColor('#00FF00')
+          }
+        }
+
         if (Phaser.Input.Keyboard.JustDown(keyLEFT)) {
           // easy mode
           game.settings = {
             alienshipSpeed: 5,
             spaceshipSpeed: 3,
-            gameTimer: 60000 
+            gameTimer: 60000,
+            onePlayer: this.onePlayer
           }
           this.sound.play('sfx_select');
           this.scene.start('playScene');    
@@ -64,7 +94,8 @@ class Menu extends Phaser.Scene {
           game.settings = {
             alienshipSpeed: 6,
             spaceshipSpeed: 4,
-            gameTimer: 45000
+            gameTimer: 45000,
+            onePlayer: this.onePlayer
           }
           this.sound.play('sfx_select');
           this.scene.start('playScene'); 
